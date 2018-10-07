@@ -22,28 +22,29 @@
                     [y (- x 1)])))
 
 (defn search-for-word [position board words string library]
+      (println position string)
       (let [to-search (find-adjacents position)]
-           (loop [pos (first to-search) go (rest to-search) words words board board library lib string string]
+           (loop [pos (first to-search) go (rest to-search) words words board board library library string string]
                  (if (nil? pos)
                    words
                    (let [letter (get board pos)
                          dict-find (get library letter)
-                         is-word (get dict-find 0)
                          current-word (str string letter)
-                         words (if-not (nil? is-word) (conj words current-word) words)]
+                         words (if (or (= 0 dict-find) (get dict-find 0)) (conj words current-word) words)
+                         _ (println letter dict-find current-word)]
                         (if (nil? dict-find)
-                          (recur (first rest) (rest go) words board library string)
-                          (search-for-word pos (dissoc board pos) words current-word dict-find)))))))
+                          (recur (first go) (rest go) words board library string)
+                          (recur (first go) (rest go) (search-for-word pos (dissoc board pos) words current-word dict-find) board library string)))))))
 
 (defn walk-across-board []
       (let [length (count (keys board))
             i (Math/sqrt length)]
-           (loop [x 0 words []]
+           (loop [x 0 words #{}]
                  (if (< x i)
                    (let [words (loop [y 0 words words]
                                      (if (< y i)
                                        (let [current [x y]
-                                             words (search-for-word current (dissoc board current) words "" lib)]
+                                             words (search-for-word current (dissoc board current) words (get board current) (get lib (get board current)))]
                                             (recur (+ 1 y) words))
                                        words))]
                         (recur (+ 1 x) words))
