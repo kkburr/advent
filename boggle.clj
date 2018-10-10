@@ -32,23 +32,47 @@
       (map #(in-board sample-board %))
       (remove nil?)))
 
-(defn search-for-words [words position string library board]
-      (let [to-search (find-adjacents position)]
-           (loop [pos (first to-search) go (rest to-search) words words board board library library string string]
-                 (if (nil? pos)
-                   words
-                   (let [letter (board-find board pos)
-                         next-lib (lib-find letter library)
-                         current (str string letter)
-                         words (if (is-word next-lib) (conj words current) words)]
-                        (if (nil? next-lib)
-                          (recur (first go) (rest go) words board library string)
-                          (recur (first go) (rest go) (search-for-words words pos current next-lib (dissoc board pos)) board library string)))))))
+(defn add-word
+      [pointer word]
+      (assoc-in pointer [:words] (conj (get pointer :words) word)))
+
+(defn add-letter
+      [pointer letters]
+      (assoc-in pointer [:string] letters))
+
+(defn change-lib
+      [pointer lib]
+      (assoc-in pointer [:lib] lib))
+
+(defn combine-words
+      [pointer set]
+      (assoc-in pointer [:words] (into (get pointer :words) set)))
+
+(defn traverse
+      [position1 board pointer1]
+      (reduce
+        (fn [{words :words string :string lib :lib, :as pointer2} position2]
+            (let [letter (board-find board position2)
+                  match (lib-find letter lib)
+                  next-word (str string letter)]
+                 (cond
+                   (nil? match)
+                   pointer2
+
+                   (and (is-word (get match 0)) (map? match))
+                   (combine-words pointer2 (get (traverse position2 (dissoc board position2) (change-lib (add-word (add-letter pointer2 next-word) next-word) match)) :words))
+
+                   (map? match)
+                   (combine-words pointer2 (get (traverse position2 (dissoc board position2) (change-lib (add-letter pointer2 next-word) match)) :words))
+
+                   (is-word match)
+                   (add-word pointer1 next-word))))
+        pointer1
+        (-> (find-adjacents position1))))
 
 (defn walk-board
       []
       (reduce-kv
-        #(search-for-words %1 %2 %3 (lib-find %3 sample-lib) (dissoc sample-board %2))
+        #(get (traverse %2 (dissoc sample-board %2) {:words %1 :string %3 :lib (lib-find %3 sample-lib)}) :words)
         #{}
-        sample-board
-        ))
+        sample-board))
