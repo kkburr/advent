@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="wedding-bingo:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/wedding_bingo_jar</output-path>
-    <root id="archive" name="wedding-bingo.jar">
-      <element id="module-output" name="wedding-bingo" />
-    </root>
-  </artifact>
-</component>
