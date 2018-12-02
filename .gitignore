@@ -1,1 +1,6 @@
 .idea*
+*.xml
+2018/output*
+output*
+.DS_Store
+*.iml
