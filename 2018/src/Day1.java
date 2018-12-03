@@ -42,7 +42,7 @@ public class Day1 {
     }
 
     public static void main(String[] args) throws IOException {
-        File file = new File("./2018/inputs/day1");
+        File file = new File("./day1");
         BufferedReader br = new BufferedReader(new FileReader(file));
         Day1 day1 = new Day1(br);
         System.out.println("Day1 part 1: " + day1.getPart1Answer());
