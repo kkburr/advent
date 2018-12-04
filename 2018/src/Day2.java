@@ -39,7 +39,7 @@ public class Day2 {
     }
 
     public Day2() throws IOException {
-        File file = new File("./day2");
+        File file = new File("./2018/src/day2");
         this.br = new BufferedReader(new FileReader(file));
         String st;
 
